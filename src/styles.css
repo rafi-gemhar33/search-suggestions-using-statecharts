@@ -1,0 +1,242 @@
+:root {
+  --c-primary-100: #f0fff4;
+  --c-primary-200: #c6f6d5;
+  --c-primary-300: #9ae6b4;
+  --c-primary-500: #48bb78;
+  --c-primary-600: #38a169;
+
+  --c-gray-100: #f7fafc;
+  --c-gray-200: #edf2f7;
+  --c-gray-300: #e2e8f0;
+  --c-gray-400: #cbd5e0;
+  --c-gray-500: #a0aec0;
+  --c-gray-600: #718096;
+  --c-gray-700: #4a5568;
+  --c-gray-800: #2d3748;
+  --c-gray-900: #1a202c;
+
+  --c-danger-700: #c53030;
+
+  --border-radius-l: 0.8rem;
+  --border-radius-m: 0.6rem;
+
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Noto Sans, Ubuntu,
+    Cantarell, Helvetica Neue;
+}
+
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+a {
+  color: var(--c-primary-500);
+}
+
+button,
+input {
+  font-family: inherit;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+}
+
+/* Icon */
+
+.icon {
+  display: inline-block;
+  width: 24px;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 100%;
+  }
+  to {
+    opacity: 20%;
+  }
+}
+
+.icon--loader .dot {
+  animation-name: pulse;
+  animation-duration: 400ms;
+  animation-timing-function: ease-out;
+  animation-direction: alternate;
+  animation-iteration-count: infinite;
+}
+
+.icon--loader .dot--2 {
+  animation-delay: 200ms;
+}
+
+.icon--loader .dot--3 {
+  animation-delay: 400ms;
+}
+
+.icon--loader {
+  display: none;
+}
+
+/* Suggestions */
+
+.suggestions {
+  overflow: hidden;
+  list-style-type: none;
+  padding-left: 0;
+  margin: 0;
+  border: 1px solid var(--c-gray-400);
+  border-radius: var(--border-radius-m);
+}
+
+/* .suggestions li {} */
+
+.suggestions li + li {
+  border-top: 1px solid var(--c-gray-200);
+}
+
+.suggestions a {
+  display: block;
+  padding: 0.75rem 1rem;
+  text-decoration: none;
+  color: var(--c-gray-700);
+}
+
+.suggestions a:hover,
+.suggestions a:active,
+.suggestions a:focus,
+.suggestions a[data-active="true"] {
+  background-color: var(--c-primary-100);
+}
+
+/* Search box */
+.search-box {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+}
+
+.search-box__field {
+  width: 100%;
+  border: 2px solid var(--c-primary-300);
+  line-height: 2.25rem;
+  font-size: 1rem;
+  padding: 0.5rem;
+  padding-right: 3rem;
+  padding-left: 1rem;
+  border-radius: var(--border-radius-l);
+}
+
+.search-box__field:active,
+.search-box__field:focus {
+  outline: none;
+  border-color: var(--c-primary-500);
+}
+
+.search-box__submit {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.625rem;
+}
+
+.search-box__suggestions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 0.5rem;
+}
+
+.search-box__message {
+  display: none;
+  padding: 0.5rem;
+}
+
+/* Button */
+.button {
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  appearance: none;
+  border: none;
+  border-radius: var(--border-radius-m);
+}
+
+.button--submit {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  background-color: var(--c-primary-500);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Search results */
+.search-results {
+  display: none;
+  padding: 1rem;
+  color: var(--c-gray-700);
+  text-align: center;
+}
+
+.search-results * + * {
+  margin-top: 1rem;
+}
+
+/* State styles */
+[data-state^="fetch"] .icon--loader {
+  display: inline-block;
+}
+
+[data-state^="error"] .button--submit,
+[data-state^="fetch"] .button--submit {
+  background-color: var(--c-gray-300);
+  color: var(--c-gray-800);
+}
+
+[data-state^="fetch"] .icon--search {
+  display: none;
+}
+
+[data-state^="error"] .search-box__message {
+  display: block;
+}
+
+[data-state^="suggestions"] .search-box__suggestions {
+  display: block;
+}
+
+[data-state^="search"] {
+  display: none;
+}
+
+[data-state^="search"] ~ .search-results {
+  display: block;
+}
+
+/* Utitlies */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.text-error {
+  color: var(--c-danger-700);
+}

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>
+      State chart based search suggestion with XState and Vanilla JS
+    </title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+  </head>
+
+  <body>
+    <div class="container">
+      <form id="search-box" class="search-box">
+        <input
+          id="q"
+          class="search-box__field"
+          type="text"
+          placeholder="Search for ‘how to...’"
+        />
+        <button
+          class="[ button button--submit ][ search-box__submit ]"
+          type="submit"
+        >
+          <span class="sr-only">Search</span>
+          <svg
+            class="icon icon--loader"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <g fill="currentColor">
+              <circle
+                class="dot dot--1"
+                cx="5"
+                cy="12"
+                r="1"
+                transform="matrix(2 0 0 2 -5 -12)"
+              />
+              <circle
+                class="dot dot--2"
+                cx="5"
+                cy="12"
+                r="1"
+                transform="matrix(2 0 0 2 2 -12)"
+              />
+              <circle
+                class="dot dot--3"
+                cx="5"
+                cy="12"
+                r="1"
+                transform="matrix(2 0 0 2 9 -12)"
+              />
+            </g>
+          </svg>
+          <svg
+            class="icon icon--search"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
+        </button>
+        <ul
+          id="suggestion-list"
+          class="[ search-box__suggestions ][ suggestions ]"
+        ></ul>
+        <div class="search-box__message">
+          <p id="message" class="text-error">
+            Something went wrong. Try again...
+          </p>
+        </div>
+      </form>
+      <div class="search-results">
+        <p>
+          Search results for
+          <strong>‘<span id="query-results" class="query"></span>’</strong>
+        </p>
+        <p><a class="reset" href="#restart">Reset</a></p>
+      </div>
+    </div>
+
+    <script src="src/index.js"></script>
+  </body>
+</html>
