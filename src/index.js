@@ -7,20 +7,20 @@ import "./styles.css";
 inspect({
   // options
   // url: 'https://statecharts.io/inspect', // (default)
-  iframe: false // open in new window
+  iframe: false, // open in new window
 });
 
 console.clear();
 
 const elForm = document.querySelector("#search-box");
-const elInput = document.querySelector("#q");
+const elInput = document.querySelector("#query");
 const elSuggestions = document.querySelector("#suggestion-list");
 const elQuery = document.querySelector("#query-results");
 const elReset = document.querySelector(".reset");
 
 const service = interpret(autocompleteInputMachine, { devTools: true });
 
-const updateSuggestion = (data, query) => {
+const updateSuggestions = (data, query) => {
   let html = "";
 
   if (Array.isArray(data) && data.length > 0) {
@@ -39,14 +39,14 @@ const updateSuggestion = (data, query) => {
       e.preventDefault();
       const query = e.currentTarget && e.currentTarget.dataset.query;
       service.send({
-        type: "SEARCH",
-        query
+        type: "click",
+        query,
       });
     });
   });
 };
 
-const updateFinalQuery = (query) => {
+const showSearchResultsMessage = (query) => {
   elQuery.innerHTML = query;
 };
 
@@ -56,11 +56,7 @@ service.onTransition((state) => {
   if (state.changed) {
     if (currentState.includes("suggestions")) {
       state.context &&
-        updateSuggestion(state.context.suggestions, state.context.typedQuery);
-    }
-
-    if (currentState.includes("search")) {
-      updateFinalQuery(state.context.typedQuery);
+        updateSuggestions(state.context.suggestions, state.context.query);
     }
 
     if (currentState.includes("suggestions.active")) {
@@ -78,7 +74,7 @@ service.onTransition((state) => {
     }
 
     if (currentState.includes("suggestions.inactive")) {
-      const lastTypedQuery = state.context && state.context.lastTypedQuery;
+      const lastTypedQuery = state.context && state.context.prevQuery;
 
       if (lastTypedQuery) {
         elInput.value = lastTypedQuery;
@@ -92,6 +88,10 @@ service.onTransition((state) => {
         elMessage.innerHTML = message;
       }
     }
+
+    if (currentState.includes("search")) {
+      showSearchResultsMessage(state.context.query);
+    }
   }
 });
 
@@ -99,16 +99,25 @@ service.start();
 
 elForm.addEventListener("submit", (e) => {
   e.preventDefault();
-
-  service.send({ type: "SEARCH" });
+  const query =
+    event.target.elements &&
+    event.target.elements.query &&
+    event.target.elements.query.value;
+  service.send({
+    type: "submit",
+    query,
+  });
 });
 
 elInput.addEventListener(
   "input",
   debounce((e) => {
+    const value =
+      (e.currentTarget && e.currentTarget.value) ||
+      (e.target && e.target.value);
     service.send({
       type: "CHANGE",
-      target: e.currentTarget || e.target
+      value,
     });
   }, 200)
 );

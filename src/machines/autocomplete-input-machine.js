@@ -8,29 +8,27 @@ export const autocompleteInputMachine = Machine(
     id: "autocomplete-input",
     initial: "idle",
     context: {
-      typedQuery: "",
+      query: "",
       message: "",
       suggestions: [],
-      activeSuggestionIndex: -1
+      activeSuggestionIndex: -1,
     },
     on: {
-      SEARCH: {
+      submit: {
         target: "search",
-        cond: "hasValue"
-      }
+        cond: "hasValue",
+      },
     },
     states: {
       idle: {
         id: "idle",
-
         on: {
-          CHANGE: "checkValue"
-        }
+          CHANGE: { target: "checkValue", actions: "saveQuery" },
+        },
       },
       checkValue: {
         id: "checkValue",
-        entry: "saveTypedQuery",
-        always: [{ target: "fetch", cond: "hasMinLength" }, { target: "idle" }]
+        always: [{ target: "fetch", cond: "hasMinLength" }, { target: "idle" }],
       },
       fetch: {
         id: "fetch",
@@ -40,106 +38,104 @@ export const autocompleteInputMachine = Machine(
           onDone: {
             target: "validateSuggestions",
             actions: assign({
-              suggestions: (context, event) => event.data
-            })
+              suggestions: (context, event) => event.data,
+            }),
           },
           onError: {
             target: "error",
             actions: assign({
-              message: (context, event) => event.data
-            })
-          }
+              message: (context, event) => event.data,
+            }),
+          },
         },
         on: {
-          CHANGE: "checkValue"
-        }
+          CHANGE: { target: "checkValue", actions: "saveQuery" },
+        },
       },
       error: {
         on: {
-          CHANGE: "checkValue"
-        }
+          CHANGE: { target: "checkValue", actions: "saveQuery" },
+        },
       },
       validateSuggestions: {
         always: [
           { target: "suggestions", cond: "hasSuggestions" },
-          { target: "idle" }
-        ]
+          { target: "idle" },
+        ],
       },
       suggestions: {
         initial: "inactive",
+        on: {
+          CHANGE: { target: "#checkValue", actions: "saveQuery" },
+          click: {
+            target: "search",
+            cond: "hasQuery",
+          },
+        },
         states: {
           inactive: {
-            entry: "setPreviouslyTypedQuery",
+            entry: "saveLastQuery",
             exit: "resetActiveSuggestionIndex",
             on: {
-              SEARCH: [
-                { target: "#search", cond: "hasQuery" },
-                { target: "#search", cond: "hasValue" },
-                { target: "inactive" }
-              ],
               keyup: [
                 {
                   target: "active",
                   cond: "isArrowUpKey",
-                  actions: "activatePrev"
+                  actions: ["activatePrev"],
                 },
                 {
                   target: "active",
                   cond: "isArrowDownKey",
-                  actions: "activateNext"
-                }
-              ]
-            }
+                  actions: ["activateNext"],
+                },
+              ],
+            },
           },
           active: {
             on: {
-              SEARCH: [
-                { target: "#search", cond: "hasQuery" },
-                { target: "active" }
-              ],
               keyup: [
-                { target: "inactive", cond: "isArrowUpKeyAndFirstItemActive" },
+                {
+                  target: "inactive",
+                  cond: "isArrowUpKeyAndFirstItemActive",
+
+                },
+                {
+                  target: "inactive",
+                  cond: "isArrowDownKeyAndLastItemActive",
+
+                },
                 {
                   target: "active",
                   cond: "isArrowUpKey",
-                  actions: "activatePrev"
+                  actions: "activatePrev",
                 },
-                { target: "inactive", cond: "isArrowDownKeyAndLastItemActive" },
                 {
                   target: "active",
                   cond: "isArrowDownKey",
-                  actions: "activateNext"
+                  actions: "activateNext",
                 },
-                {
-                  target: "#search",
-                  cond: "isEnterKey",
-                  actions: "setActiveQuery"
-                }
-              ]
-            }
-          }
+              ],
+            },
+          },
         },
-        on: {
-          CHANGE: "#checkValue"
-        }
       },
       search: {
         id: "search",
         type: "final",
-        entry: "setFinalQuery"
-      }
-    }
+        entry: "setQuery",
+      },
+    },
   },
   {
     actions: {
-      saveTypedQuery: assign({
-        typedQuery: (context, event) => event.target && event.target.value
-      }),
       resetActiveSuggestionIndex: assign({
-        activeSuggestionIndex: -1
+        activeSuggestionIndex: -1,
       }),
-      setPreviouslyTypedQuery: assign({
-        lastTypedQuery: (context, event) => context.typedQuery
+      saveQuery: assign({
+        query: (context, event) => event.value,
+      }),
+      saveLastQuery: assign({
+        prevQuery: (context, event) => context.query,
       }),
       activateNext: assign({
         activeSuggestionIndex: (context, event) => {
@@ -150,7 +146,7 @@ export const autocompleteInputMachine = Machine(
           }
 
           return index;
-        }
+        },
       }),
       activatePrev: assign({
         activeSuggestionIndex: (context, event) => {
@@ -161,27 +157,16 @@ export const autocompleteInputMachine = Machine(
           }
 
           return index;
-        }
+        },
       }),
-      setFinalQuery: assign({
-        typedQuery: (context, event) => {
-          if (event.query) {
-            return event.query;
-          }
-          return context.typedQuery;
-        }
+      setQuery: assign({
+        query: (context, event) => event.query,
       }),
-      setActiveQuery: assign({
-        typedQuery: (context, event) => {
-          return context.suggestions[context.activeSuggestionIndex];
-        }
-      })
     },
     guards: {
       hasMinLength: (context, event) =>
-        context.typedQuery && context.typedQuery.length >= MIN_LENGTH,
-      hasValue: (context, event) =>
-        context.typedQuery && context.typedQuery !== "",
+        context.query && context.query.length >= MIN_LENGTH,
+      hasValue: (context, event) => context.query && context.query !== "",
       hasSuggestions: (context) => context.suggestions.length,
       isArrowDownKey: (context, event) => event.key === "ArrowDown",
       isArrowUpKey: (context, event) => event.key === "ArrowUp",
@@ -190,12 +175,11 @@ export const autocompleteInputMachine = Machine(
         context.activeSuggestionIndex === context.suggestions.length - 1,
       isArrowUpKeyAndFirstItemActive: (context, event) =>
         event.key === "ArrowUp" && context.activeSuggestionIndex === 0,
-      isEnterKey: (context, event) => event.key === "Enter",
-      hasQuery: (context, event) => event.query
+      hasQuery: (context, event) => event.query,
     },
     services: {
       fetchSuggestions: (context) =>
-        fetchSuggestions({ query: context.typedQuery, errorRate: 0.25 })
-    }
+        fetchSuggestions({ query: context.query, errorRate: 0.25 }),
+    },
   }
 );
