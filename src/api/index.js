@@ -10,7 +10,7 @@ function randomizedDelay(maxDelay, callback) {
 
 function randomizedError(errorRate, callback) {
   if (Math.random() < errorRate) {
-    return Promise.reject("Mock server is mockloaded.");
+    return Promise.reject("Mock server is mocked an error. Keep trying...");
   } else {
     return Promise.resolve(callback());
   }
