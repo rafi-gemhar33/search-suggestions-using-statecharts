@@ -1,14 +1,10 @@
 import { interpret } from "xstate";
-import { inspect } from "@xstate/inspect";
+// import { inspect } from "@xstate/inspect";
 import debounce from "debounce";
 import { autocompleteInputMachine } from "./machines/autocomplete-input-machine";
 import "./styles.css";
 
-inspect({
-  // options
-  // url: 'https://statecharts.io/inspect', // (default)
-  iframe: false, // open in new window
-});
+// inspect({ iframe: false });
 
 console.clear();
 
@@ -18,7 +14,10 @@ const elSuggestions = document.querySelector("#suggestion-list");
 const elQuery = document.querySelector("#query-results");
 const elReset = document.querySelector(".reset");
 
-const service = interpret(autocompleteInputMachine, { devTools: true });
+const service = interpret(
+  autocompleteInputMachine
+  // , { devTools: true}
+);
 
 const updateSuggestions = (data, query) => {
   let html = "";
