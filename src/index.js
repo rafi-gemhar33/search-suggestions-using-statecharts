@@ -1,23 +1,23 @@
 import { interpret } from "xstate";
-// import { inspect } from "@xstate/inspect";
+import { inspect } from "@xstate/inspect";
 import debounce from "debounce";
 import { autocompleteInputMachine } from "./machines/autocomplete-input-machine";
 import "./styles.css";
-
-// inspect({ iframe: false });
 
 console.clear();
 
 const elForm = document.querySelector("#search-box");
 const elInput = document.querySelector("#query");
 const elSuggestions = document.querySelector("#suggestion-list");
-const elQuery = document.querySelector("#query-results");
+const elResults = document.querySelector("#query-results");
 const elReset = document.querySelector(".reset");
 
-const service = interpret(
-  autocompleteInputMachine
-  // , { devTools: true}
-);
+const DEBUG = true;
+if (DEBUG) {
+  inspect({ iframe: false });
+}
+
+const service = interpret(autocompleteInputMachine, { devTools: DEBUG });
 
 const updateSuggestions = (data, query) => {
   let html = "";
@@ -46,12 +46,14 @@ const updateSuggestions = (data, query) => {
 };
 
 const showSearchResultsMessage = (query) => {
-  elQuery.innerHTML = query;
+  elResults.innerHTML = query;
 };
 
 service.onTransition((state) => {
   const currentState = state.toStrings();
+
   elForm.dataset.state = currentState.join(" ");
+
   if (state.changed) {
     if (currentState.includes("suggestions")) {
       state.context &&

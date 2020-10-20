@@ -65,6 +65,8 @@ export const autocompleteInputMachine = Machine(
       },
       suggestions: {
         initial: "inactive",
+        entry: "saveLastQuery",
+        exit: "deleteLastQuery",
         on: {
           CHANGE: { target: "#checkValue", actions: "saveQuery" },
           click: {
@@ -74,7 +76,6 @@ export const autocompleteInputMachine = Machine(
         },
         states: {
           inactive: {
-            entry: "saveLastQuery",
             exit: "resetActiveSuggestionIndex",
             on: {
               keyup: [
@@ -136,6 +137,9 @@ export const autocompleteInputMachine = Machine(
       }),
       saveLastQuery: assign({
         prevQuery: (context, event) => context.query,
+      }),
+      deleteLastQuery: assign({
+        prevQuery: undefined,
       }),
       activateNext: assign({
         activeSuggestionIndex: (context, event) => {
