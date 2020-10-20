@@ -12,7 +12,7 @@ const elSuggestions = document.querySelector("#suggestion-list");
 const elResults = document.querySelector("#query-results");
 const elReset = document.querySelector(".reset");
 
-const DEBUG = true;
+const DEBUG = false;
 if (DEBUG) {
   inspect({ iframe: false });
 }
