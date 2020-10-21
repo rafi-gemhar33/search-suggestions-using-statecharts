@@ -28,9 +28,7 @@ const updateSuggestions = (data, query) => {
       html = html + li;
     });
   }
-  // else {
-  //   html = `<li><a href="#"  data-query="${query}">Search for <strong>"${query}"</strong></a></li>`;
-  // }
+
   elSuggestions.innerHTML = html;
   const links = Array.from(document.querySelectorAll(".suggestions li a"));
   links.forEach((a) => {

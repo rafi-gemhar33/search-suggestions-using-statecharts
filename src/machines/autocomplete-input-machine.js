@@ -14,6 +14,7 @@ export const autocompleteInputMachine = Machine(
       activeSuggestionIndex: -1,
     },
     on: {
+      CHANGE: { target: "#checkValue", actions: "saveQuery" },
       submit: {
         target: "search",
         cond: "hasValue",
@@ -22,9 +23,7 @@ export const autocompleteInputMachine = Machine(
     states: {
       idle: {
         id: "idle",
-        on: {
-          CHANGE: { target: "checkValue", actions: "saveQuery" },
-        },
+        on: {},
       },
       checkValue: {
         id: "checkValue",
@@ -48,14 +47,10 @@ export const autocompleteInputMachine = Machine(
             }),
           },
         },
-        on: {
-          CHANGE: { target: "checkValue", actions: "saveQuery" },
-        },
+
       },
       error: {
-        on: {
-          CHANGE: { target: "checkValue", actions: "saveQuery" },
-        },
+
       },
       validateSuggestions: {
         always: [
@@ -68,7 +63,6 @@ export const autocompleteInputMachine = Machine(
         entry: "saveLastQuery",
         exit: "deleteLastQuery",
         on: {
-          CHANGE: { target: "#checkValue", actions: "saveQuery" },
           click: {
             target: "search",
             cond: "hasQuery",
